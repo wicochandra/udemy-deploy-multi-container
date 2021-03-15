@@ -1,0 +1,52 @@
+version: "3"
+
+services:
+  client-app:
+    stdin_open: true
+    build:
+      context: ./client
+      dockerfile: Dockerfile.dev
+    volumes:
+      - /home/node/app/node_modules
+      - ./client:/home/node/app
+  server-app:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - PG_HOST=postgres
+      - PG_PORT=5432
+      - PG_DATABASE=postgres
+      - PG_USER=postgres
+      - PG_PASSWORD=postgres_password
+    volumes:
+      - /app/node_modules
+      - ./server:/app
+  worker-app:
+    build:
+      context: ./worker
+      dockerfile: Dockerfile.dev
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    volumes:
+      - /app/node_modules
+      - ./worker:/app
+  postgres:
+    image: postgres:latest
+    environment:
+      - POSTGRES_PASSWORD=postgres_password
+  redis:
+    image: redis:alpine
+  nginx:
+    build: 
+      context: ./nginx
+      dockerfile: Dockerfile.dev
+    restart: unless-stopped
+    depends_on:
+      - client-app
+      - server-app
+    ports:
+      - "80:80"
