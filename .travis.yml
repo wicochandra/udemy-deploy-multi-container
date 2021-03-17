@@ -1,0 +1,24 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -f ./client/Dockerfile.dev -t wicochandra/udemy-deploy-multi-client ./client
+
+script:
+  - docker run -e CI=true wicochandra/udemy-deploy-multi-client npm run test -- --coverage
+
+after_success:
+  # Build all production docker images
+  - docker build -t wicochandra/udemy-deploy-multi-client ./client
+  - docker build -t wicochandra/udemy-deploy-multi-nginx ./nginx
+  - docker build -t wicochandra/udemy-deploy-multi-server ./server
+  - docker build -t wicochandra/udemy-deploy-multi-worker ./worker
+  # Login to Docker Hub
+  - echo $DOCKER_PASSWORD | docker login -u "$DOCKER_ID" --password-stdin
+  # push images to hub.docker.com
+  - docker push wicochandra/udemy-deploy-multi-client
+  - docker push wicochandra/udemy-deploy-multi-nginx
+  - docker push wicochandra/udemy-deploy-multi-server
+  - docker push wicochandra/udemy-deploy-multi-worker
+
