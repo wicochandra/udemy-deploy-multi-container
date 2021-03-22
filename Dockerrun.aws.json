@@ -1,0 +1,35 @@
+{
+    "AWSEBDOCKERrunVersion": 2,
+    "containerDefinitions": [
+        {
+            "name": "client",
+            "image": "wicochandra/udemy-deploy-multi-client",
+            "hostname": "client-app",
+            "essential": false
+        },
+        {
+            "name": "server",
+            "image": "wicochandra/udemy-deploy-multi-server",
+            "hostname": "server-app",
+            "essential": false
+        },
+        {
+            "name": "worker",
+            "image": "wicochandra/udemy-deploy-multi-worker",
+            "hostname": "worker-app",
+            "essential": false
+        },
+        {
+            "name": "nginx",
+            "image": "wicochandra/udemy-deploy-multi-nginx",
+            "essential": true,
+            "portMappings": [
+                {
+                    "hostPort": 80,
+                    "containerPort": 80
+                }
+            ],
+            "links": ["client", "server"]
+        }
+    ]
+}

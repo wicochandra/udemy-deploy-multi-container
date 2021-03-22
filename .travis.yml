@@ -22,3 +22,14 @@ after_success:
   - docker push wicochandra/udemy-deploy-multi-server
   - docker push wicochandra/udemy-deploy-multi-worker
 
+deploy:
+  provider: elasticbeanstalk
+  region: "ap-southeast-1"
+  app: "udemy-multi-docker"
+  env: "Udemymultidocker-env"
+  bucket_name: "elasticbeanstalk-ap-southeast-1-280037490921"
+  bucket_path: "udemy-multi-docker"
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_SECRET_KEY
+  on:
+    branch: master
